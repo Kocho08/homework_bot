@@ -112,7 +112,7 @@ def main():
                 cur_status["hw_name"] = homeworks[0]["homework_name"]
                 cur_status["message"] = parse_status(homeworks[0])
             else:
-                cur_status["message"] = "домашек пока нет"
+                cur_status["message"] = "Домашка пока не принята ревьюером"
             if cur_status != prev_status:
                 send_message(bot, cur_status["message"])
                 prev_status = cur_status.copy()
