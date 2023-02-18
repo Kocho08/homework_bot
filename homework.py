@@ -6,17 +6,20 @@ from http import HTTPStatus
 import telegram
 import time
 import sys
-from dotenv import load_dotenv 
+from dotenv import load_dotenv
 
-load_dotenv()
+
 def HttpResponseNotOk(message):
+    """ошибка http respomse."""
     pass
 
 
 def WrongKeyHw():
+    """неверный key."""
     pass
 
 
+load_dotenv()
 PRACTICUM_TOKEN = os.getenv('PRACTICUM_TOKEN1')
 TELEGRAM_TOKEN = os.getenv('TELEGRAM_TOKEN1')
 TELEGRAM_CHAT_ID = os.getenv('TELEGRAM_CHAT_ID1')
@@ -34,21 +37,22 @@ HOMEWORK_VERDICTS = {
 
 
 def check_tokens():
-    """Функция проверяющая наличие токеннов"""
+    """Функция проверяющая наличие токеннов."""
     return all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID])
 
 
 def send_message(bot, message):
-    """Функция отправки сообщений от бота"""
+    """Функция отправки сообщений от бота."""
     try:
         bot.send_message(chat_id=TELEGRAM_CHAT_ID, text=message)
         logging.debug(f'send_message: Бот отправил сообщение: {message}')
     except telegram.error.TelegramError:
-        logging.error(f'send_message: Сообщение с текстом {message} не отправленно')
+        logging.error('send_message: Сообщение с текстом'
+                      f'{message} не отправленно')
 
 
 def get_api_answer(timestamp):
-    """Функция получения ответа от API"""
+    """Функция получения ответа от API."""
     payload = {'from_date': timestamp}
     try:
         response = requests.get(ENDPOINT, headers=HEADERS, params=payload)
@@ -62,7 +66,7 @@ def get_api_answer(timestamp):
 
 
 def check_response(response):
-    """Функция проверки ответ API на соответствие документации"""
+    """Функция проверки ответ API на соответствие документации."""
     if not isinstance(response, dict):
         raise TypeError('Ответ API не является словарем')
     if 'homeworks' not in response:
@@ -71,11 +75,10 @@ def check_response(response):
     if not isinstance(homeworks, list):
         raise TypeError('Ответ API не является списком')
     return homeworks
-    
 
 
 def parse_status(homework):
-    """Функция извлечения статуса конкретной домашней работы"""
+    """Функция извлечения статуса конкретной домашней работы."""
     homework_name = homework.get('homework_name')
     if not homework_name:
         error_message = 'В ответе API нет ключа "homework_name"'
@@ -86,9 +89,10 @@ def parse_status(homework):
     if not verdict:
         logging.error(f'Неожиданный статус {status} домашней работы'
                       f'{homework_name}, обнаруженный в ответе API')
-        raise WrongKeyHw('Неожиданный статус домашней работы обнаруженный в ответе API')
+        raise WrongKeyHw('Неожиданный статус домашней работы'
+                         'обнаруженный в ответе API')
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
-    
+
 
 def main():
     """Основная логика работы бота."""
@@ -113,7 +117,7 @@ def main():
                 status_last_homework = status_current_homework.get('status')
                 send_message(bot, output)
             else:
-                logging.debug('Нет новых статусов') 
+                logging.debug('Нет новых статусов')
 
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
@@ -123,10 +127,8 @@ def main():
             time.sleep(RETRY_PERIOD)
 
 
-
 if __name__ == '__main__':
     logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO)
+        format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        level=logging.INFO)
     main()
-    
