@@ -102,22 +102,22 @@ def main():
         sys.exit(message)
     bot = telegram.Bot(token=TELEGRAM_TOKEN)
     timestamp = int(time.time())
-    status_last_homework = ''
+    cur_status = {"hw_name": "", "message": ""}
+    prev_status = {"hw_name": "", "message": ""}
     while True:
         try:
             response = get_api_answer(timestamp)
             homeworks = check_response(response)
-
             if homeworks:
-                output = parse_status(homeworks[0])
+                cur_status["hw_name"] = homeworks[0]["homework_name"]
+                cur_status["message"] = parse_status(homeworks[0])
             else:
-                output = 'Домашек пока нет'
-            status_current_homework = homeworks[0]
-            if status_last_homework != status_current_homework.get('status'):
-                status_last_homework = status_current_homework.get('status')
-                send_message(bot, output)
+                cur_status["message"] = "домашек пока нет"
+            if cur_status != prev_status:
+                send_message(bot, cur_status["message"])
+                prev_status = cur_status.copy()
             else:
-                logging.debug('Нет новых статусов')
+                logging.debug('нет новых статусов')
 
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
