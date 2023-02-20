@@ -7,16 +7,7 @@ import telegram
 import time
 import sys
 from dotenv import load_dotenv
-
-
-def HttpResponseNotOk(message):
-    """ошибка http respomse."""
-    pass
-
-
-def WrongKeyHw():
-    """неверный key."""
-    pass
+from exception import HttpResponseNotOk, WrongKeyHw
 
 
 load_dotenv()
@@ -62,7 +53,7 @@ def get_api_answer(timestamp):
         return response.json()
     except requests.RequestException as i:
         logging.error(f'{ENDPOINT} не передает данные: {i}')
-        raise Exception('exeption')
+        raise Exception(f'{ENDPOINT}, не передает данные')
 
 
 def check_response(response):
@@ -122,7 +113,6 @@ def main():
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.error(message)
-            send_message(bot, message)
         finally:
             time.sleep(RETRY_PERIOD)
 
