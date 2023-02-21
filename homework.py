@@ -25,6 +25,7 @@ HOMEWORK_VERDICTS = {
     'reviewing': 'Работа взята на проверку ревьюером.',
     'rejected': 'Работа проверена: у ревьюера есть замечания.'
 }
+old_error_message = ''
 
 
 def check_tokens():
@@ -87,6 +88,7 @@ def parse_status(homework):
 
 def main():
     """Основная логика работы бота."""
+    global old_error_message
     if not check_tokens():
         message = 'Отсутсвуют обязательные переменные окружения'
         logging.critical(message)
@@ -113,6 +115,9 @@ def main():
         except Exception as error:
             message = f'Сбой в работе программы: {error}'
             logging.error(message)
+            if message != old_error_message:
+                send_message(bot, message)
+                old_error_message = message
         finally:
             time.sleep(RETRY_PERIOD)
 
